@@ -6,7 +6,7 @@
 
 **A modern, cross-platform DRM video player supporting Widevine and ClearKey encryption.**
 
-[![Build and Release](https://github.com/drmstreamer/drm-player/actions/workflows/build.yml/badge.svg)](https://github.com/drmstreamer/drm-player/actions/workflows/build.yml)
+[![Build and Release](https://github.com/DRMSTREAMER/drm-player/actions/workflows/release.yml/badge.svg)](https://github.com/DRMSTREAMER/drm-player/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -114,3 +114,4 @@ See [LICENSE](LICENSE) for details.
 <p align="center">
   Made with ❤️ by <a href="https://drmstreamer.com">DRM Streamer</a>
 </p>
+
