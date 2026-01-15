@@ -15,11 +15,9 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -72,25 +70,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v3
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      # 🔍 DEBUG – show repo structure
+      - name: Debug Android directory
+        run: |
+          ls -la
+          ls -la android-drm-player || true
+
+      # ✅ FIX-1: make gradlew executable
+      - name: Make gradlew executable
+        working-directory: android-drm-player
+        run: chmod +x gradlew
 
       - name: Build Debug APK
         working-directory: android-drm-player
@@ -115,31 +113,27 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
-      - name: Download Windows Build
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: windows-build
           path: artifacts/windows
 
-      - name: Download macOS Build
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: macos-build
           path: artifacts/macos
 
-      - name: Download Linux Build
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: linux-build
           path: artifacts/linux
 
-      - name: Download Android Build
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: android-build
           path: artifacts/android
 
-      - name: Create Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
@@ -148,6 +142,5 @@ jobs:
             artifacts/linux/*
             artifacts/android/**/*.apk
           generate_release_notes: true
-          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
