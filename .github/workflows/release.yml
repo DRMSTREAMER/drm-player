@@ -13,54 +13,53 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
-        
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: drm-player/package-lock.json
-          
+
       - name: Install Dependencies
         working-directory: drm-player
-        # Using npm install instead of ci to be safer if lockfile is missing
         run: npm install
-        
+
       - name: Build Windows
         if: matrix.os == 'windows-latest'
         working-directory: drm-player
         run: npm run build:win
-        
+
       - name: Build macOS
         if: matrix.os == 'macos-latest'
         working-directory: drm-player
         run: npm run build:mac
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
-          
+
       - name: Build Linux
         if: matrix.os == 'ubuntu-latest'
         working-directory: drm-player
         run: npm run build:linux
-        
+
       - name: Upload Windows Artifacts
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
           path: drm-player/dist/*.exe
-          
+
       - name: Upload macOS Artifacts
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: macos-build
           path: drm-player/dist/*.dmg
-          
+
       - name: Upload Linux Artifacts
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
@@ -71,20 +70,20 @@ jobs:
   build-android:
     name: Build Android App
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        
+
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
@@ -95,12 +94,12 @@ jobs:
 
       - name: Build Debug APK
         working-directory: android-drm-player
-        run: gradle assembleDebug
-        
+        run: ./gradlew assembleDebug
+
       - name: Build Release APK
         working-directory: android-drm-player
-        run: gradle assembleRelease
-        
+        run: ./gradlew assembleRelease
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -114,32 +113,32 @@ jobs:
     needs: [build-electron, build-android]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    
+
     steps:
       - name: Download Windows Build
         uses: actions/download-artifact@v4
         with:
           name: windows-build
           path: artifacts/windows
-          
+
       - name: Download macOS Build
         uses: actions/download-artifact@v4
         with:
           name: macos-build
           path: artifacts/macos
-          
+
       - name: Download Linux Build
         uses: actions/download-artifact@v4
         with:
           name: linux-build
           path: artifacts/linux
-          
+
       - name: Download Android Build
         uses: actions/download-artifact@v4
         with:
           name: android-build
           path: artifacts/android
-          
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
