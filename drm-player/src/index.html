@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https: http:; media-src * blob:;">
+    <title>DRM Player</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.min.js"></script>
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">▶</span>
+                <span class="logo-text">DRM Player</span>
+            </div>
+            <div class="header-controls">
+                <span class="drm-badge" id="drmBadge">No DRM</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Input Section -->
+            <section class="input-section" id="inputSection">
+                <div class="input-card">
+                    <h2>🎬 Play DRM Stream</h2>
+
+                    <div class="form-group">
+                        <label for="mpdUrl">MPD/DASH URL</label>
+                        <input type="url" id="mpdUrl" placeholder="https://example.com/stream.mpd">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="drmType">DRM Type</label>
+                        <select id="drmType">
+                            <option value="none">No DRM (Clear Stream)</option>
+                            <option value="widevine">Widevine</option>
+                            <option value="clearkey">ClearKey</option>
+                        </select>
+                    </div>
+
+                    <div class="drm-config" id="widevineConfig" style="display:none;">
+                        <div class="form-group">
+                            <label for="licenseUrl">Widevine License Server URL</label>
+                            <input type="url" id="licenseUrl" placeholder="https://license.example.com/widevine">
+                        </div>
+                        <div class="form-group">
+                            <label for="licenseHeaders">License Headers (JSON, optional)</label>
+                            <textarea id="licenseHeaders" rows="3"
+                                placeholder='{"Authorization": "Bearer token"}'></textarea>
+                        </div>
+                    </div>
+
+                    <div class="drm-config" id="clearkeyConfig" style="display:none;">
+                        <div class="form-group">
+                            <label for="clearKeyId">Key ID (hex)</label>
+                            <input type="text" id="clearKeyId" placeholder="abcdef1234567890abcdef1234567890">
+                        </div>
+                        <div class="form-group">
+                            <label for="clearKeyValue">Key Value (hex)</label>
+                            <input type="text" id="clearKeyValue" placeholder="1234567890abcdef1234567890abcdef">
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="playBtn">▶ Play</button>
+                        <button class="btn btn-secondary" id="loadSampleBtn">Load Sample</button>
+                    </div>
+
+                    <!-- Sample Streams -->
+                    <div class="samples">
+                        <h3>Sample Streams</h3>
+                        <div class="sample-list" id="sampleList">
+                            <button class="sample-item"
+                                data-url="https://dash.akamaized.net/envivio/EnvisivoDash3/manifest.mpd"
+                                data-drm="none">
+                                <span class="sample-name">Clear Stream (Akamai)</span>
+                            </button>
+                            <button class="sample-item"
+                                data-url="https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd"
+                                data-drm="none">
+                                <span class="sample-name">Angel One (Clear)</span>
+                            </button>
+                            <button class="sample-item"
+                                data-url="https://storage.googleapis.com/shaka-demo-assets/angel-one-widevine/dash.mpd"
+                                data-drm="widevine" data-license="https://cwip-shaka-proxy.appspot.com/no_auth">
+                                <span class="sample-name">Angel One (Widevine)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Player Section -->
+            <section class="player-section" id="playerSection" style="display:none;">
+                <div class="player-container">
+                    <video id="video" autoplay controls></video>
+                    <div class="player-overlay" id="playerOverlay">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <div class="player-info">
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value" id="statusText">Ready</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Resolution:</span>
+                        <span class="info-value" id="resolutionText">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Bitrate:</span>
+                        <span class="info-value" id="bitrateText">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">DRM:</span>
+                        <span class="info-value" id="drmText">-</span>
+                    </div>
+                </div>
+
+                <div class="player-controls">
+                    <button class="btn btn-secondary" id="backBtn">← Back</button>
+                    <button class="btn btn-secondary" id="fullscreenBtn">⛶ Fullscreen</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <span>DRM Player v1.0 | Widevine & ClearKey Support</span>
+        </footer>
+    </div>
+
+    <script src="player.js"></script>
+</body>
+
+</html>
